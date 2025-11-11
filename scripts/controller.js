@@ -13,7 +13,7 @@ function startController() {
   // register key-presses
   document.addEventListener("keydown", keyPress);
 
-  let numOfRows = model.getNumofRows();
+  let numOfRows = model.getNumOfRows();
   let numOfCol = model.getNumOfCols();
 
   // gets access to other modules
@@ -39,14 +39,16 @@ function startController() {
   // initialize the view after the DOM cells
   view.initView();
 
+  model.setGameRunning(true);
+
   // model.startGame();
   tick();
 }
 
 // gets the player object from the model
-let player = model.getPlayer();
+let next = model.getPlayer();
 // sets the player to the window
-window.player = player;
+window.player = next;
 // sets the direction to the window
 window.direction = model.state.direction;
 
@@ -63,68 +65,101 @@ function log(text) {
 
 function tick() {
   // setup next game tick
-  setTimeout(tick, 500);
+  if (model.isGameRunning()) {
+    setTimeout(tick, 500);
+  } else {
+    // Game over!
+    model.setGameRunning(false);
+    return;
+  }
+
+  // commit the next direction to the direction
+  // prevents 180 movement when clicking faster than the game tick
+  model.state.direction = model.state.nextDirection;
+
+  // sets model variables
+  const snake = model.getSnake();
+  // the head of the snake is actually the tail of the list inside of it
+  const head = snake.tail().data;
+  const next = { row: head.row, col: head.col };
+  const rows = model.getNumOfRows();
+  const cols = model.getNumOfRows();
 
   // remove player from the model
-  model.writeToCell(player.row, player.col, 0);
+  model.writeToCell(next.row, next.col, 0);
 
   switch (model.state.direction) {
     case "left":
-      // move the player to the left
-      player.col--;
-      if (player.col < 0) player.col = 9; // if player reached left border, comes out at the right
+      next.col--;
+      if (next.col < 0) next.col = cols - 1;
       break;
     case "right":
-      // move the player to the right
-      player.col++;
-      if (player.col > 9) player.col = 0; // right border -> left border
+      next.col++;
+      if (next.col >= cols) next.col = 0;
       break;
     case "up":
-      // move the player up
-      player.row--;
-      if (player.row < 0) player.row = 9; // top border -> bottom border
+      next.row--;
+      if (next.row < 0) next.row = rows - 1;
       break;
     case "down":
-      // move the player down
-      player.row++;
-      if (player.row > 9) player.row = 0; // bottom border -> top border
+      next.row++;
+      if (next.row >= rows) next.row = 0;
       break;
   }
 
-  // checks if player got the goal
-  if (player.col == goal.col && player.row == goal.row) {
-    log(`Got the goal! Value at row: ${goal.row} col: ${goal.col}`);
+  // check for goal
+  const goal = model.getGoal();
+  let grow = false;
+  if (next.col === goal.col && next.row === goal.row) {
+    log(`Got the goal at row: ${goal.row}, col: ${goal.col}`);
+    // sets goal to random new free cell
     model.spawnGoal();
+    grow = true;
   }
 
-  // re-add player to the model
-  model.writeToCell(player.row, player.col, 1);
+  // move the snake
+  snake.enqueue(next); // add new head
+  if (!grow) snake.dequeue(); // remove tail unless the snake just ate a goal
+
+  // clear grid before redrawing
+  model.clearGrid();
+  // loop through the snake
+  for (let node = snake.head(); node; node = node.next) {
+    // get the row and col of a node on the snake
+    const { row, col } = node.data;
+    // updates the grid with new snake value (1)
+    model.writeToCell(row, col, 1);
+  }
+  // updates grid with new goal value
+  const newGoal = model.getGoal();
+  model.writeToCell(newGoal.row, newGoal.col, 2);
 
   // update the display of the entire model
   view.displayGrid();
 }
 
 function keyPress(event) {
+  const dir = model.state.direction;
+  const next = model.state.nextDirection;
+
   switch (event.key) {
     case "ArrowLeft":
     case "a":
-      if (model.state.direction === "right") break; // can't do a 180
-      model.state.direction = "left";
+      if (dir !== "right" && next !== "right")
+        model.state.nextDirection = "left";
       break;
     case "ArrowRight":
     case "d":
-      if (model.state.direction === "left") break;
-      model.state.direction = "right";
+      if (dir !== "left" && next !== "left")
+        model.state.nextDirection = "right";
       break;
     case "ArrowUp":
     case "w":
-      if (model.state.direction === "down") break;
-      model.state.direction = "up";
+      if (dir !== "down" && next !== "down") model.state.nextDirection = "up";
       break;
     case "ArrowDown":
     case "s":
-      if (model.state.direction === "up") break;
-      model.state.direction = "down";
+      if (dir !== "up" && next !== "up") model.state.nextDirection = "down";
       break;
   }
 }

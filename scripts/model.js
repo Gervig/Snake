@@ -24,6 +24,16 @@ if (window.innerWidth <= 480) {
   cellSize = "40px";
 }
 
+let gameRunning = false;
+
+export function isGameRunning() {
+  return gameRunning;
+}
+
+export function setGameRunning(value) {
+  gameRunning = value;
+}
+
 // initalizes a player object at row, col
 // rows/2 & cols/2 means the player will start in the middle
 const player = {
@@ -47,6 +57,15 @@ export function getSnake() {
   return snake;
 }
 
+export function extendSnake(row, col) {
+  snake.enqueue({ row, col });
+}
+
+export function moveSnake(nextHead, grow) {
+  snake.enqueue(nextHead);
+  if (!grow) snake.dequeue();
+}
+
 export function getGoal() {
   return goal;
 }
@@ -55,7 +74,7 @@ export function getNumOfCols() {
   return cols;
 }
 
-export function getNumofRows() {
+export function getNumOfRows() {
   return rows;
 }
 
@@ -107,6 +126,10 @@ export function getGrid() {
   return gameGrid;
 }
 
+export function clearGrid() {
+  gameGrid.clear();
+}
+
 export function getFreeCells() {
   return freeCells;
 }
@@ -117,4 +140,5 @@ export function setFreeCells(newCells) {
 
 export let state = {
   direction: "",
+  nextDirection: "",
 };

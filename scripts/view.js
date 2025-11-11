@@ -11,26 +11,21 @@ export function registerEventHandlers() {
 // button logic
 function clickedButton(event) {
   const button = event.target;
+  const dir = model.state.direction;
+  const next = model.state.nextDirection;
 
   switch (button.id) {
     case "up":
-      //TODO: if you click faster than the framerate you can do a 180 by...
-      // for example, given up, then left, then down before game's next tick
-      // results in a 180
-      if (model.state.direction === "down") break; // can't do a 180
-      model.state.direction = "up";
+      if (dir !== "down" && next !== "down") model.state.nextDirection = "up";
       break;
     case "left":
-      if (model.state.direction === "right") break;
-      model.state.direction = "left";
+      if (dir !== "right" && next !== "right") model.state.nextDirection = "left";
       break;
     case "right":
-      if (model.state.direction === "left") break;
-      model.state.direction = "right";
+      if (dir !== "left" && next !== "left") model.state.nextDirection = "right";
       break;
     case "down":
-      if (model.state.direction === "up") break;
-      model.state.direction = "down";
+      if (dir !== "up" && next !== "up") model.state.nextDirection = "down";
       break;
   }
 }
@@ -50,7 +45,7 @@ let goal = model.getGoal();
 export function initView() {
   const gridElement = document.getElementById("grid");
   cells = gridElement.querySelectorAll(".cell");
-  rows = model.getNumofRows();
+  rows = model.getNumOfRows();
   cols = model.getNumOfCols();
   // draws the first goal
   model.writeToCell(goal.row, goal.col, 2);
