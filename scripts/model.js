@@ -1,4 +1,5 @@
 import Grid from "../data-structure/grid.js";
+import Queue from "../data-structure/queue.js";
 
 const scale = 0.5;
 
@@ -10,7 +11,7 @@ if (window.innerWidth <= 480) {
   // mobile
   cols * scale;
   rows * scale;
-  cellSize = "35px";
+  cellSize = "36px";
 } else if (window.innerWidth <= 768) {
   // tablet
   cols * scale;
@@ -30,8 +31,24 @@ const player = {
   col: Math.floor(cols / 2),
 };
 
+const snake = new Queue();
+snake.enqueue(player);
+
+const goal = {
+  row: 1,
+  col: 1,
+};
+
 export function getPlayer() {
   return player;
+}
+
+export function getSnake() {
+  return snake;
+}
+
+export function getGoal() {
+  return goal;
 }
 
 export function getNumOfCols() {
@@ -41,6 +58,8 @@ export function getNumOfCols() {
 export function getNumofRows() {
   return rows;
 }
+
+export function setNewGoal() {}
 
 // sets the variables in the style.css
 const gridElement = document.getElementById("grid");
@@ -64,6 +83,18 @@ function log(text) {
 
 let gameGrid = new Grid(rows, cols);
 
+// array for holding col, row objects of free cells
+let freeCells = [];
+
+export function spawnGoal() {
+  if (freeCells.length === 0) return; // can't spawn a new goal
+  const { row, col } = freeCells[Math.floor(Math.random() * freeCells.length)]; // finds a random spot
+  // sets new col and rows for goal
+  goal.row = row;
+  goal.col = col;
+  writeToCell(row, col, 2); // writes new goal
+}
+
 export function writeToCell(row, col, value) {
   gameGrid.set({ row: row, col: col }, value);
 }
@@ -76,6 +107,14 @@ export function getGrid() {
   return gameGrid;
 }
 
+export function getFreeCells() {
+  return freeCells;
+}
+
+export function setFreeCells(newCells) {
+  freeCells = newCells;
+}
+
 export let state = {
-  direction: "left",
+  direction: "",
 };

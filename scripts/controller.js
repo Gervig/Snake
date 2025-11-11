@@ -42,12 +42,18 @@ function startController() {
   // model.startGame();
   tick();
 }
+
 // gets the player object from the model
 let player = model.getPlayer();
 // sets the player to the window
 window.player = player;
 // sets the direction to the window
 window.direction = model.state.direction;
+
+// gets the goal object from the model
+let goal = model.getGoal();
+// sets the goal to the window
+window.goal = goal;
 
 startController();
 
@@ -66,23 +72,29 @@ function tick() {
     case "left":
       // move the player to the left
       player.col--;
-      if (player.col < 0) player.col = 9;
+      if (player.col < 0) player.col = 9; // if player reached left border, comes out at the right
       break;
     case "right":
       // move the player to the right
       player.col++;
-      if (player.col > 9) player.col = 0;
+      if (player.col > 9) player.col = 0; // right border -> left border
       break;
     case "up":
       // move the player up
       player.row--;
-      if (player.row < 0) player.row = 9;
+      if (player.row < 0) player.row = 9; // top border -> bottom border
       break;
     case "down":
       // move the player down
       player.row++;
-      if (player.row > 9) player.row = 0;
+      if (player.row > 9) player.row = 0; // bottom border -> top border
       break;
+  }
+
+  // checks if player got the goal
+  if (player.col == goal.col && player.row == goal.row) {
+    log(`Got the goal! Value at row: ${goal.row} col: ${goal.col}`);
+    model.spawnGoal();
   }
 
   // re-add player to the model
@@ -93,23 +105,25 @@ function tick() {
 }
 
 function keyPress(event) {
-  // log(event);
-
   switch (event.key) {
     case "ArrowLeft":
     case "a":
+      if (model.state.direction === "right") break; // can't do a 180
       model.state.direction = "left";
       break;
     case "ArrowRight":
     case "d":
+      if (model.state.direction === "left") break;
       model.state.direction = "right";
       break;
     case "ArrowUp":
     case "w":
+      if (model.state.direction === "down") break;
       model.state.direction = "up";
       break;
     case "ArrowDown":
     case "s":
+      if (model.state.direction === "up") break;
       model.state.direction = "down";
       break;
   }
