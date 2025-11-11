@@ -66,7 +66,7 @@ function log(text) {
 function tick() {
   // setup next game tick
   if (model.isGameRunning()) {
-    setTimeout(tick, 500);
+    setTimeout(tick, 200);
   } else {
     // Game over!
     model.setGameRunning(false);
@@ -136,6 +136,18 @@ function tick() {
 
   // update the display of the entire model
   view.displayGrid();
+
+  //TODO: implement collision!
+  const freeCells = model.getFreeCells();
+
+  if (model.isGameRunning()) {
+    const isCollision = !freeCells.some(
+      (cell) => cell.row === next.row && cell.col === next.col
+    );
+    if (isCollision) {
+      // log(`There was a collision!`);
+    }
+  }
 }
 
 function keyPress(event) {

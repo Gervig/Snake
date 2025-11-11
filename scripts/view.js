@@ -76,6 +76,6 @@ export function displayGrid() {
     }
   }
 
-  // store free cells it back in your model for reuse
+  // store free cells back in your model for reuse
   model.setFreeCells(freeCells);
 }

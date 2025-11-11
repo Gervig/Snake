@@ -97,3 +97,7 @@ h1 {
 .goal {
   background-color: #cc0;
 }
+
+.collision {
+  background-color: red;
+}
