@@ -25,7 +25,7 @@ export default class Queue {
   }
 
   peek() {
-    return this.head();
+    return this.head().data;
   }
 
   size() {
