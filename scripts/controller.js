@@ -39,8 +39,6 @@ function startController() {
   // initialize the view after the DOM cells
   view.initView();
 
-  model.setGameRunning(true);
-
   // model.startGame();
   tick();
 }
@@ -65,13 +63,7 @@ function log(text) {
 
 function tick() {
   // setup next game tick
-  if (model.isGameRunning()) {
-    setTimeout(tick, 200);
-  } else {
-    // Game over!
-    model.setGameRunning(false);
-    return;
-  }
+  setTimeout(tick, 200);
 
   // commit the next direction to the direction
   // prevents 180 movement when clicking faster than the game tick
@@ -117,6 +109,21 @@ function tick() {
     grow = true;
   }
 
+  // collision check
+  // iterate over the snake itself using a while loop
+  let node = snake.list.head; // start at the head (tail of the queue)
+  while (node && model.isGameRunning()) {
+    if (node.data.row === next.row && node.data.col === next.col) {
+      model.state.gameRunning = false;
+      // write collision value to grid
+      model.writeToCell(next.row, next.col, 3);
+      // show final frame
+      view.displayGrid();
+      return; // stop tick
+    }
+    node = node.next;
+  }
+
   // move the snake
   snake.enqueue(next); // add new head
   if (!grow) snake.dequeue(); // remove tail unless the snake just ate a goal
@@ -141,12 +148,17 @@ function tick() {
   const freeCells = model.getFreeCells();
 
   if (model.isGameRunning()) {
-    const isCollision = !freeCells.some(
-      (cell) => cell.row === next.row && cell.col === next.col
-    );
-    if (isCollision) {
-      // log(`There was a collision!`);
-    }
+    // const isCollision = !freeCells.some(
+    //   (cell) => cell.row === next.row && cell.col === next.col
+    // );
+    // for (let i = 0; i < freeCells.length; i++) {
+    //   if (freeCells[i].row === next.row && freeCells[i].col == next.col) {
+    //     log(`Collision at ${freeCells[i]}`);
+    //   }
+    // }
+    // if (isCollision) {
+    //   log(`There was a collision!`);
+    // }
   }
 }
 
@@ -174,4 +186,5 @@ function keyPress(event) {
       if (dir !== "up" && next !== "up") model.state.nextDirection = "down";
       break;
   }
+  if (!model.isGameRunning()) model.setGameRunning(true);
 }

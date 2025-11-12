@@ -19,15 +19,19 @@ function clickedButton(event) {
       if (dir !== "down" && next !== "down") model.state.nextDirection = "up";
       break;
     case "left":
-      if (dir !== "right" && next !== "right") model.state.nextDirection = "left";
+      if (dir !== "right" && next !== "right")
+        model.state.nextDirection = "left";
       break;
     case "right":
-      if (dir !== "left" && next !== "left") model.state.nextDirection = "right";
+      if (dir !== "left" && next !== "left")
+        model.state.nextDirection = "right";
       break;
     case "down":
       if (dir !== "up" && next !== "up") model.state.nextDirection = "down";
       break;
   }
+
+  if (!model.isGameRunning()) model.setGameRunning(true);
 }
 
 function log(text) {
@@ -72,6 +76,9 @@ export function displayGrid() {
           cells[index].classList.add("goal");
           cells[index].classList.remove("player");
           break;
+        case 3: // collision
+          cells[index].classList.remove("player", "goal");
+          cells[index].classList.add("collision");
       }
     }
   }
