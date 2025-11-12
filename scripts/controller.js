@@ -55,6 +55,8 @@ let goal = model.getGoal();
 // sets the goal to the window
 window.goal = goal;
 
+let countOfGames = 0;
+
 startController();
 
 function log(text) {
@@ -63,6 +65,7 @@ function log(text) {
 
 var tickTimeout = null;
 
+// --- GAME LOOP --- //
 function tick() {
   // setup next game tick
   tickTimeout = setTimeout(tick, 200);
@@ -105,7 +108,6 @@ function tick() {
   const goal = model.getGoal();
   let grow = false;
   if (next.col === goal.col && next.row === goal.row) {
-    log(`Got the goal at row: ${goal.row}, col: ${goal.col}`);
     // sets goal to random new free cell
     model.spawnGoal();
     grow = true;
@@ -128,6 +130,7 @@ function tick() {
 
       // draw the collision cell as red
       model.writeToCell(next.row, next.col, 3);
+      model.setCollision(true);
 
       // show final frame
       view.displayGrid();
@@ -158,6 +161,11 @@ function tick() {
 }
 
 function keyPress(event) {
+  // can't move if game over, have to reset
+  if (model.collisionDetected()) {
+    return;
+  }
+
   const dir = model.state.direction;
   const next = model.state.nextDirection;
 
@@ -188,44 +196,50 @@ const resetButton = document.getElementById("resetButton");
 resetButton.addEventListener("click", resetGame);
 
 function resetGame() {
-  // cancel any pending tick
-  if (tickTimeout) {
-    clearTimeout(tickTimeout);
-    tickTimeout = null;
+  //TODO: fix this
+  // // cancel any pending tick
+  // if (tickTimeout) {
+  //   clearTimeout(tickTimeout);
+  //   tickTimeout = null;
 
-    // stop current game
-    model.setGameRunning(false);
-  }
+  //   // stop current game
+  //   model.setGameRunning(false);
+  // }
 
-  // reset snake
-  const snake = model.getSnake();
-  snake.clear();
-  snake.enqueue({
-    row: Math.floor(model.getNumOfRows() / 2),
-    col: Math.floor(model.getNumOfCols() / 2),
-  });
+  // // reset snake
+  // const snake = model.getSnake();
+  // snake.clear();
+  // snake.enqueue({
+  //   row: Math.floor(model.getNumOfRows() / 2),
+  //   col: Math.floor(model.getNumOfCols() / 2),
+  // });
 
-  // clear grid
-  model.clearGrid();
+  // // clear grid
+  // model.clearGrid();
 
-  // reset direction
-  model.state.direction = "";
-  model.state.nextDirection = "";
+  // // reset direction
+  // model.state.direction = "";
+  // model.state.nextDirection = "";
 
-  // reset goal
-  model.spawnGoal();
+  // // reset goal
+  // model.spawnGoal();
 
-  // update grid and display
-  for (let node = snake.head(); node; node = node.next) {
-    const { row, col } = node.data;
-    model.writeToCell(row, col, 1);
-  }
-  const goal = model.getGoal();
-  model.writeToCell(goal.row, goal.col, 2);
+  // // update grid and display
+  // for (let node = snake.head(); node; node = node.next) {
+  //   const { row, col } = node.data;
+  //   model.writeToCell(row, col, 1);
+  // }
+  // const goal = model.getGoal();
+  // model.writeToCell(goal.row, goal.col, 2);
 
-  view.displayGrid();
+  // view.displayGrid();
 
-  // start game again
-  model.setGameRunning(true);
-  tick(); // restart the game loop
+  // // new game, no collision
+  // model.setCollision(false);
+  // log(`sat collision in model to ${model.collisionDetected()}`);
+  // // start game again
+  // model.setGameRunning(true);
+  // tick(); // restart the game loop
+
+  window.location.reload();
 }

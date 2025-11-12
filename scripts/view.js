@@ -10,6 +10,11 @@ export function registerEventHandlers() {
 
 // button logic
 function clickedButton(event) {
+  // can't move if game over, have to reset
+  if (model.collisionDetected() && !model.isGameRunning()) {
+    return;
+  }
+
   const button = event.target;
   const dir = model.state.direction;
   const next = model.state.nextDirection;

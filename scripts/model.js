@@ -25,6 +25,7 @@ if (window.innerWidth <= 480) {
 }
 
 let gameRunning = false;
+let collision = false;
 
 export function isGameRunning() {
   return gameRunning;
@@ -32,6 +33,14 @@ export function isGameRunning() {
 
 export function setGameRunning(value) {
   gameRunning = value;
+}
+
+export function collisionDetected() {
+  return collision;
+}
+
+export function setCollision(value) {
+  collision = value;
 }
 
 // initalizes a player object at row, col
