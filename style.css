@@ -49,6 +49,7 @@ h1 {
   align-items: center;
   gap: 1em;
   margin: 1em 0;
+  touch-action: manipulation;
 }
 
 #up {
