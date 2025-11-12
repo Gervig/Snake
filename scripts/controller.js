@@ -188,23 +188,25 @@ const resetButton = document.getElementById("resetButton");
 resetButton.addEventListener("click", resetGame);
 
 function resetGame() {
-  // stop current game
-  model.setGameRunning(false);
-
   // cancel any pending tick
   if (tickTimeout) {
     clearTimeout(tickTimeout);
+    tickTimeout = null;
+
+    // stop current game
+    model.setGameRunning(false);
   }
 
-  // clear grid
-  model.clearGrid();
+  // reset snake
   const snake = model.getSnake();
-
   snake.clear();
   snake.enqueue({
     row: Math.floor(model.getNumOfRows() / 2),
     col: Math.floor(model.getNumOfCols() / 2),
   });
+
+  // clear grid
+  model.clearGrid();
 
   // reset direction
   model.state.direction = "";
