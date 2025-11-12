@@ -35,4 +35,12 @@ export default class Queue {
   get(index) {
     return this.list.get(index);
   }
+
+  clear() {
+    let i = 0;
+    while (i < this.size()) {
+      this.dequeue();
+      i++;
+    }
+  }
 }

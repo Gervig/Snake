@@ -61,9 +61,11 @@ function log(text) {
   console.log(text);
 }
 
+var tickTimeout = null;
+
 function tick() {
   // setup next game tick
-  setTimeout(tick, 200);
+  tickTimeout = setTimeout(tick, 200);
 
   // commit the next direction to the direction
   // prevents 180 movement when clicking faster than the game tick
@@ -109,30 +111,30 @@ function tick() {
     grow = true;
   }
 
-// collision check
-let node = snake.list.head; // start at head (tail of the queue)
-while (node && model.isGameRunning()) {
-  if (node.data.row === next.row && node.data.col === next.col) {
-    // stop the game
-    model.state.gameRunning = false;
+  // collision check
+  let node = snake.list.head; // start at head (tail of the queue)
+  while (node && model.isGameRunning()) {
+    if (node.data.row === next.row && node.data.col === next.col) {
+      // stop the game
+      model.state.gameRunning = false;
 
-    // draw snake up to the previous node
-    let prevNode = node.prev;
-    while (prevNode) {
-      const { row, col } = prevNode.data;
-      model.writeToCell(row, col, 1); // draw normal snake segment
-      prevNode = prevNode.next; // iterate forward from head to collision
+      // draw snake up to the previous node
+      let prevNode = node.prev;
+      while (prevNode) {
+        const { row, col } = prevNode.data;
+        model.writeToCell(row, col, 1); // draw normal snake segment
+        prevNode = prevNode.next; // iterate forward from head to collision
+      }
+
+      // draw the collision cell as red
+      model.writeToCell(next.row, next.col, 3);
+
+      // show final frame
+      view.displayGrid();
+      return; // stop tick
     }
-
-    // draw the collision cell as red
-    model.writeToCell(next.row, next.col, 3);
-
-    // show final frame
-    view.displayGrid();
-    return; // stop tick
+    node = node.next;
   }
-  node = node.next;
-}
 
   // move the snake
   snake.enqueue(next); // add new head
@@ -153,23 +155,6 @@ while (node && model.isGameRunning()) {
 
   // update the display of the entire model
   view.displayGrid();
-
-  //TODO: implement collision!
-  const freeCells = model.getFreeCells();
-
-  if (model.isGameRunning()) {
-    // const isCollision = !freeCells.some(
-    //   (cell) => cell.row === next.row && cell.col === next.col
-    // );
-    // for (let i = 0; i < freeCells.length; i++) {
-    //   if (freeCells[i].row === next.row && freeCells[i].col == next.col) {
-    //     log(`Collision at ${freeCells[i]}`);
-    //   }
-    // }
-    // if (isCollision) {
-    //   log(`There was a collision!`);
-    // }
-  }
 }
 
 function keyPress(event) {
@@ -197,4 +182,49 @@ function keyPress(event) {
       break;
   }
   if (!model.isGameRunning()) model.setGameRunning(true);
+}
+
+const resetButton = document.getElementById("resetButton");
+resetButton.addEventListener("click", resetGame);
+
+function resetGame() {
+  // stop current game
+  model.setGameRunning(false);
+
+  // cancel any pending tick
+  if (tickTimeout) {
+    clearTimeout(tickTimeout);
+  }
+
+  // clear grid
+  model.clearGrid();
+
+  const snake = model.getSnake();
+
+  snake.clear();
+  snake.enqueue({
+    row: Math.floor(model.getNumOfRows() / 2),
+    col: Math.floor(model.getNumOfCols() / 2),
+  });
+
+  // reset direction
+  model.state.direction = "";
+  model.state.nextDirection = "";
+
+  // reset goal
+  model.spawnGoal();
+
+  // update grid and display
+  for (let node = snake.head(); node; node = node.next) {
+    const { row, col } = node.data;
+    model.writeToCell(row, col, 1);
+  }
+  const goal = model.getGoal();
+  model.writeToCell(goal.row, goal.col, 2);
+
+  view.displayGrid();
+
+  // start game again
+  model.setGameRunning(true);
+  tick(); // restart the game loop
 }

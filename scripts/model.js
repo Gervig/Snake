@@ -57,6 +57,10 @@ export function getSnake() {
   return snake;
 }
 
+export function setSnake(newSnake) {
+  snake = newSnake;
+}
+
 export function extendSnake(row, col) {
   snake.enqueue({ row, col });
 }

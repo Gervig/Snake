@@ -65,7 +65,7 @@ export function displayGrid() {
 
       switch (cellValue) {
         case 0: // empty
-          cells[index].classList.remove("player", "goal");
+          cells[index].classList.remove("player", "goal", "collision");
           freeCells.push({ row, col }); // track free cell
           break;
         case 1: // snake
