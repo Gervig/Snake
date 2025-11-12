@@ -70,11 +70,11 @@ export function displayGrid() {
           break;
         case 1: // snake
           cells[index].classList.add("player");
-          cells[index].classList.remove("goal");
+          cells[index].classList.remove("goal", "collision");
           break;
         case 2: // goal
           cells[index].classList.add("goal");
-          cells[index].classList.remove("player");
+          cells[index].classList.remove("player", "collision");
           break;
         case 3: // collision
           cells[index].classList.remove("player", "goal");

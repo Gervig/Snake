@@ -198,7 +198,6 @@ function resetGame() {
 
   // clear grid
   model.clearGrid();
-
   const snake = model.getSnake();
 
   snake.clear();
