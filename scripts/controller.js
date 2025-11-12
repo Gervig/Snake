@@ -109,20 +109,30 @@ function tick() {
     grow = true;
   }
 
-  // collision check
-  // iterate over the snake itself using a while loop
-  let node = snake.list.head; // start at the head (tail of the queue)
-  while (node && model.isGameRunning()) {
-    if (node.data.row === next.row && node.data.col === next.col) {
-      model.state.gameRunning = false;
-      // write collision value to grid
-      model.writeToCell(next.row, next.col, 3);
-      // show final frame
-      view.displayGrid();
-      return; // stop tick
+// collision check
+let node = snake.list.head; // start at head (tail of the queue)
+while (node && model.isGameRunning()) {
+  if (node.data.row === next.row && node.data.col === next.col) {
+    // stop the game
+    model.state.gameRunning = false;
+
+    // draw snake up to the previous node
+    let prevNode = node.prev;
+    while (prevNode) {
+      const { row, col } = prevNode.data;
+      model.writeToCell(row, col, 1); // draw normal snake segment
+      prevNode = prevNode.next; // iterate forward from head to collision
     }
-    node = node.next;
+
+    // draw the collision cell as red
+    model.writeToCell(next.row, next.col, 3);
+
+    // show final frame
+    view.displayGrid();
+    return; // stop tick
   }
+  node = node.next;
+}
 
   // move the snake
   snake.enqueue(next); // add new head
