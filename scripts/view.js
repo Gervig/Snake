@@ -11,7 +11,7 @@ export function registerEventHandlers() {
 // button logic
 function clickedButton(event) {
   // can't move if game over, have to reset
-  if (model.collisionDetected() && !model.isGameRunning()) {
+  if (model.collisionDetected()) {
     return;
   }
 
