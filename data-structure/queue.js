@@ -37,10 +37,8 @@ export default class Queue {
   }
 
   clear() {
-    let i = 0;
-    while (i < this.size()) {
+    while (this.size() > 0) {
       this.dequeue();
-      i++;
     }
   }
 }
