@@ -161,6 +161,11 @@ function tick() {
 }
 
 function keyPress(event) {
+  // prevent default scrolling behavior for arrow keys
+  if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(event.key)) {
+    event.preventDefault();
+  }
+
   // can't move if game over, have to reset
   if (model.collisionDetected()) {
     return;
